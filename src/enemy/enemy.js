@@ -9,6 +9,7 @@ export class Enemy {
     this.yVelocity = 0;
     this.friction = 0.2;
     this.maxVelocity = 1.5;
+    this.health = 100;
     this.sprite = new Sprite({
       x: x,
       y: y,
@@ -46,6 +47,10 @@ export class Enemy {
         if(this.sprite.y < enemy.sprite.y){
           this.sprite.y-=this.maxVelocity*2;
         }
+      }
+      if(enemy.sprite.collidesWith(Global.player.sprite) && Global.player.health > 0){
+        Global.player.health -= 10;
+        console.log(Global.player.health)
       }
     });
 

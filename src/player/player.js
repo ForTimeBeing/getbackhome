@@ -8,6 +8,7 @@ export class Player {
     this.yVelocity = 0;
     this.friction = 0.2;
     this.maxVelocity = 3;
+    this.health = 100;
     this.sprite = undefined;
     this.spriteSheet = undefined;
     this.spriteSheet = SpriteSheet({
@@ -44,7 +45,6 @@ export class Player {
         this.xVelocity = 0;
       }
     }
-
     if (keyPressed('up')) {
       if(this.yVelocity > this.maxVelocity*-1){
         this.yVelocity = this.yVelocity-this.friction;
@@ -60,6 +60,7 @@ export class Player {
         this.yVelocity = 0;
       }
     }
+
     this.sprite.x += this.xVelocity;
     this.sprite.y += this.yVelocity;
 
@@ -67,9 +68,26 @@ export class Player {
       this.sprite.x = -this.sprite.width;
     }
 
+    if (this.sprite)
     this.sprite.update();
   }
   render(){
     this.sprite.render();
+
+    //Player's health bar
+    //TODO: Remove health when hit
+    var ctx = Global.canvas.getContext("2d");
+    ctx.fillStyle = "#008000";
+    ctx.fillRect(this.sprite.x - 2,this.sprite.y - 10,35,7);
+
+    //For when player dies
+    //TODO: Pause rendering after dying
+    //TODO: Add button
+    if (this.health <= 0){
+      var gameover = Global.canvas.getContext("2d");
+      gameover.fillStyle = "#FF0000";
+      gameover.font = "60px Arial"
+      gameover.fillText("Game Over",260,280); 
+    }
   }
 }
