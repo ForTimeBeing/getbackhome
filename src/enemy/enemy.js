@@ -3,7 +3,7 @@ import Global from '../global';
 import utils from '../utils';
 
 export class Enemy {
-  constructor(x,y){
+  constructor(x, y) {
     this._id = utils.uuidv4();
     this.xVelocity = 0;
     this.yVelocity = 0;
@@ -19,46 +19,53 @@ export class Enemy {
     });
     console.log(this._id);
   }
-  
-  update(){
+
+  update() {
     let currentX = this.sprite.x;
     let currentY = this.sprite.y;
     let playerX = Global.player.sprite.x;
     let playerY = Global.player.sprite.y;
-    let dstX = currentX-playerX;
-    let dstY = currentY-playerY;
+    let dstX = currentX - playerX;
+    let dstY = currentY - playerY;
 
-    if(dstX > this.maxVelocity*2){
-      this.sprite.x-=this.maxVelocity;
-    }else if(dstX < this.maxVelocity*2){
-      this.sprite.x+=this.maxVelocity;
+    if (dstX > this.maxVelocity * 2) {
+      this.sprite.x -= this.maxVelocity;
+    } else if (dstX < this.maxVelocity * 2) {
+      this.sprite.x += this.maxVelocity;
     }
-    if(dstY > this.maxVelocity*2){
-      this.sprite.y-=this.maxVelocity;
-    }else if(dstY < this.maxVelocity*2){
-      this.sprite.y+=this.maxVelocity;
+    if (dstY > this.maxVelocity * 2) {
+      this.sprite.y -= this.maxVelocity;
+    } else if (dstY < this.maxVelocity * 2) {
+      this.sprite.y += this.maxVelocity;
     }
 
-    Global.enemies.forEach((enemy)=>{
-      if(enemy._id !== this._id && this.sprite.collidesWith(enemy.sprite)){
-        if(this.sprite.x < enemy.sprite.x){
-          this.sprite.x-=this.maxVelocity*2;
+    Global.enemies.forEach((enemy) => {
+      if (enemy._id !== this._id && this.sprite.collidesWith(enemy.sprite)) {
+        if (this.sprite.x < enemy.sprite.x) {
+          this.sprite.x -= this.maxVelocity * 2;
         }
-        if(this.sprite.y < enemy.sprite.y){
-          this.sprite.y-=this.maxVelocity*2;
+        if (this.sprite.y < enemy.sprite.y) {
+          this.sprite.y -= this.maxVelocity * 2;
         }
       }
-      if(!Global.player.invincibility && Global.player.health > 0 && enemy.sprite.collidesWith(Global.player.sprite)){
+      if (!Global.player.invincibility && Global.player.health > 0 && enemy.sprite.collidesWith(Global.player.sprite)) {
         Global.player.health -= 10;
         Global.player.invincibility = true;
         Global.player.invincibilityCount = 160;
+      }
+      if (enemy.health <= 0) {
+        for (var i = 0; i < Global.enemies.length; i++) {
+          if (enemy._id == Global.enemies[i]._id) {
+            Global.enemies.splice(i, 1);
+          }
+        }
       }
     });
 
 
     this.sprite.update();
   }
-  render(){
+  render() {
     this.sprite.render();
   }
 }
