@@ -48,9 +48,10 @@ export class Enemy {
           this.sprite.y-=this.maxVelocity*2;
         }
       }
-      if(enemy.sprite.collidesWith(Global.player.sprite) && Global.player.health > 0){
+      if(!Global.player.invincibility && Global.player.health > 0 && enemy.sprite.collidesWith(Global.player.sprite)){
         Global.player.health -= 10;
-        console.log(Global.player.health)
+        Global.player.invincibility = true;
+        Global.player.invincibilityCount = 160;
       }
     });
 

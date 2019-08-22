@@ -9,6 +9,8 @@ export class Player {
     this.friction = 0.2;
     this.maxVelocity = 3;
     this.health = 100;
+    this.invincibility = false;
+    this.invincibilityCount = 0;
     this.sprite = undefined;
     this.spriteSheet = undefined;
     this.spriteSheet = SpriteSheet({
@@ -25,7 +27,29 @@ export class Player {
     this.sprite = new Sprite({
       x: x,
       y: y,
-      animations: self.spriteSheet.animations
+      animations: self.spriteSheet.animations,
+      render: function(){
+        this.context.save();
+        if(self.invincibility){
+          if(self.invincibilityCount < 120 && self.invincibilityCount > 115){
+            this.context.globalAlpha = 1;
+          }else if(self.invincibilityCount < 90 && self.invincibilityCount > 85){
+            this.context.globalAlpha = 1;
+          }else if(self.invincibilityCount < 60 && self.invincibilityCount > 55){
+            this.context.globalAlpha = 1;
+          }else if(self.invincibilityCount < 30 && self.invincibilityCount > 25){
+            this.context.globalAlpha = 1;
+          }else if(self.invincibilityCount < 15 && self.invincibilityCount > 10){
+            this.context.globalAlpha = 1;
+          }else if(self.invincibilityCount < 5 && self.invincibilityCount > 3){
+            this.context.globalAlpha = 1;
+          }else{
+            this.context.globalAlpha = 0.5;
+          }
+        }
+        this.draw();
+        this.context.restore();
+      }
     });
   }
   
@@ -68,7 +92,11 @@ export class Player {
       this.sprite.x = -this.sprite.width;
     }
 
-    if (this.sprite)
+    this.invincibilityCount--;
+    if (this.invincibility == true && this.invincibilityCount <= 0){
+      this.invincibility = false;
+    }
+
     this.sprite.update();
   }
   render(){
@@ -78,7 +106,7 @@ export class Player {
     //TODO: Remove health when hit
     var ctx = Global.canvas.getContext("2d");
     ctx.fillStyle = "#008000";
-    ctx.fillRect(this.sprite.x - 2,this.sprite.y - 10,35,7);
+    ctx.fillRect(this.sprite.x - 2, this.sprite.y - 10, this.health*0.35, 7);
 
     //For when player dies
     //TODO: Pause rendering after dying
