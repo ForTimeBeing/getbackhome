@@ -1,5 +1,7 @@
-import { keyPressed, Sprite, SpriteSheet } from 'kontra';
+import { keyPressed, Sprite, SpriteSheet, initPointer, pointer, onPointerDown } from 'kontra';
 import Global from '../global';
+import { Z_SYNC_FLUSH } from 'zlib';
+
 
 export class Player {
   constructor(x, y) {
@@ -55,13 +57,13 @@ export class Player {
   }
 
   update() {
-    if (keyPressed('left')) {
+    if (keyPressed('a')) {
       this.direction = 'left'
       if (this.xVelocity > this.maxVelocity * -1) {
         this.xVelocity = this.xVelocity - this.friction;
       }
     }
-    else if (keyPressed('right')) {
+    else if (keyPressed('d')) {
       this.direction = 'right'
       if (this.xVelocity < this.maxVelocity) {
         this.xVelocity = this.xVelocity + this.friction;
@@ -72,13 +74,13 @@ export class Player {
         this.xVelocity = 0;
       }
     }
-    if (keyPressed('up')) {
+    if (keyPressed('w')) {
       this.direction = 'up'
       if (this.yVelocity > this.maxVelocity * -1) {
         this.yVelocity = this.yVelocity - this.friction;
       }
     }
-    else if (keyPressed('down')) {
+    else if (keyPressed('s')) {
       this.direction = 'down'
       if (this.yVelocity < this.maxVelocity) {
         this.yVelocity = this.yVelocity + this.friction;
@@ -106,6 +108,14 @@ export class Player {
     //TODO: Add knockback
     //TODO: Add sword sprite
     //TODO: Add swing based off mouse
+  
+
+    initPointer();
+
+    //console.log(pointer)
+    //console.log("Player", Global.player.sprite.x + 15, Global.player.sprite.y + 15)
+
+
     if (keyPressed('space')) {
       Global.enemies.forEach((enemy) => {
         if (Global.player.direction == 'up') {
@@ -135,6 +145,22 @@ export class Player {
   render() {
     this.sprite.render();
 
+    var drawLine = Global.canvas.getContext("2d");
+    drawLine.beginPath();
+    drawLine.moveTo(Global.player.sprite.x + 15, Global.player.sprite.y + 15);
+    drawLine.lineTo(pointer.x,pointer.y);
+    drawLine.stroke();
+
+
+    //onPointerDown(function (e, object) {
+    var drawCircle = Global.canvas.getContext("2d");
+    drawCircle.beginPath();
+    drawCircle.arc((Global.player.sprite.x + 15), (Global.player.sprite.y + 15), 50, 0, 2 * Math.PI);
+    drawCircle.lineWidth = 3;
+    drawCircle.strokeStyle = '#FF0000';
+    drawCircle.stroke();
+    //})
+    
     //Player's health bar
     var ctx = Global.canvas.getContext("2d");
     ctx.fillStyle = "#008000";
