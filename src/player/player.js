@@ -19,6 +19,8 @@ export class Player {
     this.maxVelocity = 3;
     this.health = 100;
     this.direction = "";
+    this.canDodge = true;
+    this.dodgeCooldown = 0;
     this.invincibility = false;
     this.invincibilityCount = 0;
     this.sprite = undefined;
@@ -140,14 +142,47 @@ export class Player {
       this.direction = "idle";
     }
 
+        //Swings sword
+    //TODO: Add swing charge
+    //TODO: Add knockback
+    //TODO: Add sword sprite
+    initPointer();
+    onPointerDown((evt, object) => {
+      if(evt.button == 1){
+        Global.enemies.forEach((enemy) => {
+          //Checks to see if an enemy is within the hitbox
+          //Note: only checks to see if center of sprite is in the hitbox
+          if ((enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS >= (getPointOnLine().x + Global.player.sprite.x)) && (enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS >= getPointOnLine().y + Global.player.sprite.y) &&
+            (enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().x + Global.player.sprite.x + HIT_BOX_SIZE_X) && (enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS >= getPointOnLine().y + Global.player.sprite.y) &&
+            (enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS >= getPointOnLine().x + Global.player.sprite.x) && (enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().y + Global.player.sprite.y + HIT_BOX_SIZE_Y) &&
+            (enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().x + Global.player.sprite.x + HIT_BOX_SIZE_X) && enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().y + Global.player.sprite.y + 
+            HIT_BOX_SIZE_Y){
+              enemy.health = 0
+            }
+        });
+      }else if(evt.button == 2 && this.canDodge){
+        this.maxVelocity = 12;
+        this.friction = 1;
+        this.dodgeCooldown = 60;
+        this.canDodge = false
+        setTimeout(() => {
+          this.maxVelocity = 3;
+        }, 200);
+      }
+    });
+
     if (keyPressed('a')) {
       if (this.xVelocity > this.maxVelocity * -1) {
         this.xVelocity = this.xVelocity - this.friction;
+      }else{
+        this.xVelocity = this.maxVelocity * -1;
       }
     }
     else if (keyPressed('d')) {
       if (this.xVelocity < this.maxVelocity) {
         this.xVelocity = this.xVelocity + this.friction;
+      }else{
+        this.xVelocity = this.maxVelocity;
       }
     } else {
       this.xVelocity = this.xVelocity > 0 ? this.xVelocity - this.friction : this.xVelocity + this.friction;
@@ -158,11 +193,15 @@ export class Player {
     if (keyPressed('w')) {
       if (this.yVelocity > this.maxVelocity * -1) {
         this.yVelocity = this.yVelocity - this.friction;
+      }else{
+        this.yVelocity = this.maxVelocity * -1;
       }
     }
     else if (keyPressed('s')) {
       if (this.yVelocity < this.maxVelocity) {
         this.yVelocity = this.yVelocity + this.friction;
+      }else{
+        this.yVelocity = this.maxVelocity;
       }
     } else {
       this.yVelocity = this.yVelocity > 0 ? this.yVelocity - this.friction : this.yVelocity + this.friction;
@@ -214,27 +253,10 @@ export class Player {
     }
     this.sprite.playAnimation(this.direction);
 
-
-    //Swings sword
-    //TODO: Add swing charge
-    //TODO: Add knockback
-    //TODO: Add sword sprite
-    initPointer();
-    onPointerDown(function (e, object) {
-      Global.enemies.forEach((enemy) => {
-        //Checks to see if an enemy is within the hitbox
-        //Note: only checks to see if center of sprite is in the hitbox
-        if ((enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS >= (getPointOnLine().x + Global.player.sprite.x)) && (enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS >= getPointOnLine().y + Global.player.sprite.y) &&
-          (enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().x + Global.player.sprite.x + HIT_BOX_SIZE_X) && (enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS >= getPointOnLine().y + Global.player.sprite.y) &&
-          (enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS >= getPointOnLine().x + Global.player.sprite.x) && (enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().y + Global.player.sprite.y + HIT_BOX_SIZE_Y) &&
-          (enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().x + Global.player.sprite.x + HIT_BOX_SIZE_X) && enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().y + Global.player.sprite.y + 
-          HIT_BOX_SIZE_Y){
-            enemy.health = 0
-          }
-      });
-    })
-    
-
+    this.dodgeCooldown--;
+    if (this.canDodge == false && this.dodgeCooldown <= 0) {
+      this.canDodge = true;
+    }
 
     //Sets player invincibility and damage from enemy x
     this.invincibilityCount--;
@@ -262,6 +284,12 @@ export class Player {
     var ctx = Global.canvas.getContext("2d");
     ctx.fillStyle = "#008000";
     ctx.fillRect(this.sprite.x - 2, this.sprite.y - 10, this.health * 0.35, 7);
+
+
+    if(this.dodgeCooldown > 0){
+      ctx.fillStyle = "#00217d";
+      ctx.fillRect(this.sprite.x - 2, this.sprite.y - 14, this.dodgeCooldown * 0.6, 4);
+    }
 
     //Can be removed for space - Used for debugging
     if (DRAW_HITBOX == true){

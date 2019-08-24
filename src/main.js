@@ -4,6 +4,10 @@ import Global from './global';
 var { canvas } = init();
 initKeys();
 
+document.addEventListener('contextmenu', function(ev) {
+  ev.preventDefault();
+}, false);
+
 Global.init(function () {
   Global.gameLoop = GameLoop({
     update: function () {
