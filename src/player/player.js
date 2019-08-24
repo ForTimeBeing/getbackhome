@@ -175,11 +175,45 @@ export class Player {
       this.direction += "walking";
     }
 
-    this.sprite.x += this.xVelocity;
-    this.sprite.y += this.yVelocity;
+    if(!Global.tileEngine.engine.layerCollidesWith("walls", this.sprite)){
+      this.sprite.lastX = this.sprite.x;
+      this.sprite.x += this.xVelocity;
+      this.sprite.lastY = this.sprite.y;
+      this.sprite.y += this.yVelocity;
+    }else{
+      let canMoveVert = true;
+      let canMoveHori = true;
+
+      this.sprite.y += this.yVelocity;
+      this.sprite.x = this.sprite.lastX;
+      if(Global.tileEngine.engine.layerCollidesWith("walls", this.sprite)){
+        canMoveVert = false;
+      }
+
+      this.sprite.x += this.xVelocity;
+      this.sprite.y = this.sprite.lastY;
+      if(Global.tileEngine.engine.layerCollidesWith("walls", this.sprite)){
+        canMoveHori = false;
+      }
+
+      if(canMoveHori){
+        this.sprite.lastX = this.sprite.x;
+        this.sprite.x += this.xVelocity;
+      }else{
+        this.sprite.x = this.sprite.lastX;
+        this.xVelocity = 0;
+      }
+
+      if(canMoveVert){
+        this.sprite.lastY = this.sprite.y;
+        this.sprite.y += this.yVelocity;
+      }else{
+        this.sprite.y = this.sprite.lastY;
+        this.yVelocity = 0;
+      }
+    }
     this.sprite.playAnimation(this.direction);
 
-    // console.log(this.sprite.currentAnimation);
 
     //Swings sword
     //TODO: Add swing charge
