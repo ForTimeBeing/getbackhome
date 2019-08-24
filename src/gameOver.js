@@ -15,5 +15,10 @@ export const gameOver = () => {
     gameOver.classList.remove("hidden");
     restartButton.classList.remove("hidden");
 
-    restartButton.onclick = utils.resetGame();
+    restartButton.onclick = () => {
+        utils.resetGame(() => {
+            gameOver.classList.add("hidden");
+            restartButton.classList.add("hidden");
+        });
+    };
 };

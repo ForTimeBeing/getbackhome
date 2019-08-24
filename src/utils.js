@@ -9,12 +9,10 @@ var utils = {
       return v.toString(16);
     });
   },
-  resetGame: ()=>{
-    gameOver.classList.add("hidden");
-    restartButton.classList.add("hidden");
+  resetGame: (callback)=>{
     Global.player = undefined;
     Global.enemies = [];
-    Global.player = new Player(200, 200);
+    Global.player = new Player(200, 200, Global.playerSheetImg);
     Global.player.render();
     for(let i = 0;i<=Math.floor(Math.random() * 50)+15;i++){
         Global.enemies.push(new Enemy(Math.floor(Math.random() * 900), Math.floor(Math.random() * 500)))
@@ -23,6 +21,7 @@ var utils = {
         enemy.render();
     });
     Global.gameLoop.start();
+    callback();
   }
 }
 
