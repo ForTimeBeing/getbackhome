@@ -48,11 +48,6 @@ export class Enemy {
           this.sprite.y -= this.maxVelocity * 2;
         }
       }
-      if (!Global.player.invincibility && Global.player.health > 0 && enemy.sprite.collidesWith(Global.player.sprite)) {
-        Global.player.health -= 10;
-        Global.player.invincibility = true;
-        Global.player.invincibilityCount = 160;
-      }
       if (enemy.health <= 0) {
         for (var i = 0; i < Global.enemies.length; i++) {
           if (enemy._id == Global.enemies[i]._id) {

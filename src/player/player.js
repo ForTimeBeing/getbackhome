@@ -1,6 +1,14 @@
 import { keyPressed, Sprite, SpriteSheet } from 'kontra';
 import Global from '../global';
 
+const CIRCLE_RADIUS = 30 // For distance of the hitbox from the player
+const MIDDLE_OF_PLAYER_COORDS = 15  // Centers coords to center of player sprite
+const MIDDLE_OF_ENEMY_COORDS = 10 // Centers coords to center of enemy sprite
+const HIT_BOX_SIZE_X = 30 // Controls size of hitbox
+const HIT_BOX_SIZE_Y = 30 // Controls size of hitbox
+
+const DRAW_HITBOX = true // Allows hitbox to be drawn for debugging - Can be removed for space later
+
 export class Player {
   constructor(x, y) {
     var self = this;
@@ -97,39 +105,42 @@ export class Player {
       this.sprite.x = -this.sprite.width;
     }
 
-    this.invincibilityCount--;
-    if (this.invincibility == true && this.invincibilityCount <= 0) {
-      this.invincibility = false;
-    }
     //Swings sword
     //TODO: Add swing charge
     //TODO: Add knockback
     //TODO: Add sword sprite
-    //TODO: Add swing based off mouse
-    if (keyPressed('space')) {
+    initPointer();
+    onPointerDown(function (e, object) {
       Global.enemies.forEach((enemy) => {
-        if (Global.player.direction == 'up') {
-          if (enemy.sprite.x > Global.player.sprite.x - 15 && enemy.sprite.x < Global.player.sprite.x + 15 && enemy.sprite.y > Global.player.sprite.y - 35 && enemy.sprite.y < Global.player.sprite.y - 15) {
+        //Checks to see if an enemy is within the hitbox
+        //Note: only checks to see if center of sprite is in the hitbox
+        if ((enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS >= (getPointOnLine().x + Global.player.sprite.x)) && (enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS >= getPointOnLine().y + Global.player.sprite.y) &&
+          (enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().x + Global.player.sprite.x + HIT_BOX_SIZE_X) && (enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS >= getPointOnLine().y + Global.player.sprite.y) &&
+          (enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS >= getPointOnLine().x + Global.player.sprite.x) && (enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().y + Global.player.sprite.y + HIT_BOX_SIZE_Y) &&
+          (enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().x + Global.player.sprite.x + HIT_BOX_SIZE_X) && enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().y + Global.player.sprite.y + 
+          HIT_BOX_SIZE_Y){
+
+            
             enemy.health = 0
           }
-        }
-        if (Global.player.direction == 'left') {
-          if (enemy.sprite.x < Global.player.sprite.x - 15 && enemy.sprite.x > Global.player.sprite.x - 35 && enemy.sprite.y < Global.player.sprite.y + 15 && enemy.sprite.y > Global.player.sprite.y - 15) {
-            enemy.health = 0
-          }
-        }
-        if (Global.player.direction == 'down') {
-          if (enemy.sprite.x > Global.player.sprite.x - 15 && enemy.sprite.x < Global.player.sprite.x + 15 && enemy.sprite.y < Global.player.sprite.y + 35 && enemy.sprite.y > Global.player.sprite.y + 15) {
-            enemy.health = 0
-          }
-        }
-        if (Global.player.direction == 'right') {
-          if (enemy.sprite.x > Global.player.sprite.x + 15 && enemy.sprite.x < Global.player.sprite.x + 35 && enemy.sprite.y < Global.player.sprite.y + 15 && enemy.sprite.y > Global.player.sprite.y - 15) {
-            enemy.health = 0
-          }
-        }
       });
+    })
+    
+
+
+    //Sets player invincibility and damage from enemy x
+    this.invincibilityCount--;
+    if (this.invincibility == true && this.invincibilityCount <= 0) {
+      this.invincibility = false;
     }
+    Global.enemies.forEach((enemy) => {
+      if (!Global.player.invincibility && Global.player.health > 0 && enemy.sprite.collidesWith(Global.player.sprite)) {
+        Global.player.health -= 10;
+        Global.player.invincibility = true;
+        Global.player.invincibilityCount = 160;
+      }
+    });
+
     this.sprite.update();
   }
   render() {
@@ -140,15 +151,44 @@ export class Player {
     ctx.fillStyle = "#008000";
     ctx.fillRect(this.sprite.x - 2, this.sprite.y - 10, this.health * 0.35, 7);
 
-    //For when player dies
-    //TODO: Pause rendering after dying
-    //TODO: Add reset button
-    //Possibily just reset the game instead of death screen?
-    if (this.health <= 0) {
-      var gameover = Global.canvas.getContext("2d");
-      gameover.fillStyle = "#FF0000";
-      gameover.font = "60px Arial"
-      gameover.fillText("Game Over", 260, 280);
+    //Can be removed for space - Used for debugging
+    if (DRAW_HITBOX == true){
+      var drawLine = Global.canvas.getContext("2d");
+      drawLine.beginPath();
+      drawLine.moveTo(Global.player.sprite.x + MIDDLE_OF_PLAYER_COORDS, Global.player.sprite.y + MIDDLE_OF_PLAYER_COORDS);
+      drawLine.lineTo(pointer.x, pointer.y);
+      drawLine.stroke();
+
+      var drawCircle = Global.canvas.getContext("2d");
+      drawCircle.beginPath();
+      drawCircle.arc((Global.player.sprite.x + MIDDLE_OF_PLAYER_COORDS), (Global.player.sprite.y + MIDDLE_OF_PLAYER_COORDS), CIRCLE_RADIUS, 0, 2 * Math.PI);
+      drawCircle.lineWidth = 3;
+      drawCircle.strokeStyle = '#FF0000';
+      drawCircle.stroke();
+
+      var drawHitbox = Global.canvas.getContext("2d");
+      drawHitbox.rect(getPointOnLine().x + Global.player.sprite.x, getPointOnLine().y + Global.player.sprite.y, HIT_BOX_SIZE_X, HIT_BOX_SIZE_Y);
+      drawHitbox.stroke();
     }
+  }
+}
+
+function sendEnemyTowardsPlayer(){
+  var dx = pointer.x - enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS;
+  var dy = pointer.y - enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS;
+
+  var angle = Math.atan2(dy,dx)
+
+
+}
+
+//Gets point on circle where the line intersects(For placing hitbox)
+function getPointOnLine() {
+  var dx = pointer.x - Global.player.sprite.x - MIDDLE_OF_PLAYER_COORDS;
+  var dy = pointer.y - Global.player.sprite.y - MIDDLE_OF_PLAYER_COORDS;
+  var a = Math.atan2(dy, dx)
+  return {
+    x: Math.cos(a) * CIRCLE_RADIUS,
+    y: Math.sin(a) * CIRCLE_RADIUS
   }
 }
