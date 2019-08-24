@@ -2,8 +2,6 @@ import Global from './global';
 import { Player } from "./player/player";
 import { Enemy } from "./enemy/enemy"
 
-//TODO: on reset: clear game and restart
-
 export const gameOver = () => {
 
     Global.gameLoop.stop();

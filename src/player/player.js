@@ -1,5 +1,6 @@
 import { keyPressed, Sprite, SpriteSheet, initPointer, pointer, onPointerDown } from 'kontra';
 import Global from '../global';
+import {gameOver} from '../gameOver';
 
 const CIRCLE_RADIUS = 30 // For distance of the hitbox from the player
 const MIDDLE_OF_PLAYER_COORDS = 15  // Centers coords to center of player sprite
@@ -141,6 +142,10 @@ export class Player {
         Global.player.invincibilityCount = 160;
       }
     });
+
+    if (this.health <= 0) {
+      gameOver();
+    }
 
     this.sprite.update();
   }
