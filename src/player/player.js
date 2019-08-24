@@ -1,4 +1,4 @@
-import { keyPressed, Sprite, SpriteSheet } from 'kontra';
+import { keyPressed, Sprite, SpriteSheet, initPointer, pointer, onPointerDown } from 'kontra';
 import Global from '../global';
 
 const CIRCLE_RADIUS = 30 // For distance of the hitbox from the player
@@ -63,13 +63,13 @@ export class Player {
   }
 
   update() {
-    if (keyPressed('left')) {
+    if (keyPressed('a')) {
       this.direction = 'left'
       if (this.xVelocity > this.maxVelocity * -1) {
         this.xVelocity = this.xVelocity - this.friction;
       }
     }
-    else if (keyPressed('right')) {
+    else if (keyPressed('d')) {
       this.direction = 'right'
       if (this.xVelocity < this.maxVelocity) {
         this.xVelocity = this.xVelocity + this.friction;
@@ -80,13 +80,13 @@ export class Player {
         this.xVelocity = 0;
       }
     }
-    if (keyPressed('up')) {
+    if (keyPressed('w')) {
       this.direction = 'up'
       if (this.yVelocity > this.maxVelocity * -1) {
         this.yVelocity = this.yVelocity - this.friction;
       }
     }
-    else if (keyPressed('down')) {
+    else if (keyPressed('s')) {
       this.direction = 'down'
       if (this.yVelocity < this.maxVelocity) {
         this.yVelocity = this.yVelocity + this.friction;
@@ -105,6 +105,9 @@ export class Player {
       this.sprite.x = -this.sprite.width;
     }
 
+
+
+
     //Swings sword
     //TODO: Add swing charge
     //TODO: Add knockback
@@ -119,8 +122,6 @@ export class Player {
           (enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS >= getPointOnLine().x + Global.player.sprite.x) && (enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().y + Global.player.sprite.y + HIT_BOX_SIZE_Y) &&
           (enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().x + Global.player.sprite.x + HIT_BOX_SIZE_X) && enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().y + Global.player.sprite.y + 
           HIT_BOX_SIZE_Y){
-
-            
             enemy.health = 0
           }
       });

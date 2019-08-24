@@ -1,0 +1,35 @@
+canvas {
+    position: relative;
+}
+
+#game {
+    z-index: 1;
+}
+
+#gameOverOverlay {
+    background-color: rgba(132, 132, 132, 0.5);
+    position: absolute;
+    top: 0px; 
+    left: 0px;
+    align-content: center;
+    z-index: 2;
+}
+
+button {
+    color: black;
+    background-color: green;
+    border-radius: 10px;
+    position: absolute;
+    bottom: 150px;
+    left: 320px;
+    height: 60px;
+    width: 200px;
+    font-size: 20px;
+    font-weight: bold;
+    z-index: 2;
+}
+
+.hidden {
+    visibility: hidden;
+    z-index: 0;
+}
