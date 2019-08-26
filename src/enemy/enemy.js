@@ -62,5 +62,12 @@ export class Enemy {
   }
   render() {
     this.sprite.render();
+
+    //Enemy's health bar
+    if (this.health < 100){
+      var ctx = Global.canvas.getContext("2d");
+      ctx.fillStyle = "#FF0000";
+      ctx.fillRect(this.sprite.x - 5, this.sprite.y - 10, this.health * 0.35, 7);
+    }
   }
 }

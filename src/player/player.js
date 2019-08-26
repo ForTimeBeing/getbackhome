@@ -1,14 +1,14 @@
-import { keyPressed, Sprite, SpriteSheet, initPointer, pointer, onPointerDown } from 'kontra';
+import { keyPressed, Sprite, SpriteSheet, initPointer, pointer, onPointerDown, onPointerUp } from 'kontra';
 import Global from '../global';
 import { gameOver } from '../gameOver';
 
 const CIRCLE_RADIUS = 30 // For distance of the hitbox from the player
 const MIDDLE_OF_PLAYER_COORDS = 16  // Centers coords to center of player sprite
 const MIDDLE_OF_ENEMY_COORDS = 10 // Centers coords to center of enemy sprite
-const HIT_BOX_SIZE_X = 30 // Controls size of hitbox
-const HIT_BOX_SIZE_Y = 30 // Controls size of hitbox
+const HIT_BOX_SIZE_X = 35 // Controls size of hitbox
+const HIT_BOX_SIZE_Y = 35 // Controls size of hitbox
 
-const DRAW_HITBOX = false // Allows hitbox to be drawn for debugging - Can be removed for space later
+const DRAW_HITBOX = true // Allows hitbox to be drawn for debugging - Can be removed for space later
 
 export class Player {
   constructor(x, y, spriteSheetImg) {
@@ -18,6 +18,8 @@ export class Player {
     this.friction = 0.2;
     this.maxVelocity = 3;
     this.health = 100;
+    this.damage = 10;
+    this.holdDamage = false;
     this.direction = "";
     this.canDodge = true;
     this.dodgeCooldown = 0;
@@ -121,6 +123,7 @@ export class Player {
   }
 
   update() {
+    //Start of movement ->
     var dx = pointer.x - Global.player.sprite.x - MIDDLE_OF_PLAYER_COORDS;
     var dy = pointer.y - Global.player.sprite.y - MIDDLE_OF_PLAYER_COORDS;
     var angle = Math.atan2(dy,dx)*(180/Math.PI);
@@ -141,36 +144,6 @@ export class Player {
     if(!this.direction){
       this.direction = "idle";
     }
-
-        //Swings sword
-    //TODO: Add swing charge
-    //TODO: Add knockback
-    //TODO: Add sword sprite
-    initPointer();
-    onPointerDown((evt, object) => {
-      if(evt.button == 1){
-        Global.enemies.forEach((enemy) => {
-          //Checks to see if an enemy is within the hitbox
-          //Note: only checks to see if center of sprite is in the hitbox
-          if ((enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS >= (getPointOnLine().x + Global.player.sprite.x)) && (enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS >= getPointOnLine().y + Global.player.sprite.y) &&
-            (enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().x + Global.player.sprite.x + HIT_BOX_SIZE_X) && (enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS >= getPointOnLine().y + Global.player.sprite.y) &&
-            (enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS >= getPointOnLine().x + Global.player.sprite.x) && (enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().y + Global.player.sprite.y + HIT_BOX_SIZE_Y) &&
-            (enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().x + Global.player.sprite.x + HIT_BOX_SIZE_X) && enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().y + Global.player.sprite.y + 
-            HIT_BOX_SIZE_Y){
-              enemy.health = 0
-            }
-        });
-      }else if(evt.button == 2 && this.canDodge){
-        this.maxVelocity = 12;
-        this.friction = 1;
-        this.dodgeCooldown = 60;
-        this.canDodge = false
-        setTimeout(() => {
-          this.maxVelocity = 3;
-        }, 200);
-      }
-    });
-
     if (keyPressed('a')) {
       if (this.xVelocity > this.maxVelocity * -1) {
         this.xVelocity = this.xVelocity - this.friction;
@@ -252,13 +225,13 @@ export class Player {
       }
     }
     this.sprite.playAnimation(this.direction);
+    //<- End of movement
 
     this.dodgeCooldown--;
     if (this.canDodge == false && this.dodgeCooldown <= 0) {
       this.canDodge = true;
     }
 
-    //Sets player invincibility and damage from enemy x
     this.invincibilityCount--;
     if (this.invincibility == true && this.invincibilityCount <= 0) {
       this.invincibility = false;
@@ -268,6 +241,46 @@ export class Player {
         Global.player.health -= 10;
         Global.player.invincibility = true;
         Global.player.invincibilityCount = 160;
+      }
+    });
+
+    if (this.holdDamage == true) {
+      this.damage++
+    }
+        //Swings sword
+    //TODO: Add knockback
+    //TODO: Add sword sprite
+    initPointer();
+    onPointerDown((evt, object) => {
+      if(evt.button == 0){
+        this.holdDamage = true
+        onPointerUp((evt,object) => {
+          if (this.damage >= 75){
+            this.damage = 75
+          }
+          Global.enemies.forEach((enemy) => {
+            //Checks to see if an enemy is within the hitbox
+            //Note: only checks to see if center of sprite is in the hitbox
+            if ((enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS >= (getPointOnLine().x + Global.player.sprite.x)) && (enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS >= getPointOnLine().y + Global.player.sprite.y) &&
+              (enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().x + Global.player.sprite.x + HIT_BOX_SIZE_X) && (enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS >= getPointOnLine().y + Global.player.sprite.y) &&
+              (enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS >= getPointOnLine().x + Global.player.sprite.x) && (enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().y + Global.player.sprite.y + HIT_BOX_SIZE_Y) &&
+              (enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().x + Global.player.sprite.x + HIT_BOX_SIZE_X) && enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().y + Global.player.sprite.y + 
+              HIT_BOX_SIZE_Y){
+                console.log(this.damage);
+                enemy.health = enemy.health - this.damage;
+              }
+          });  
+          this.holdDamage = false
+          this.damage = 10
+        });
+      }else if(evt.button == 2 && this.canDodge){
+        this.maxVelocity = 12;
+        this.friction = 1;
+        this.dodgeCooldown = 60;
+        this.canDodge = false
+        setTimeout(() => {
+          this.maxVelocity = 3;
+        }, 200);
       }
     });
 
@@ -312,16 +325,6 @@ export class Player {
     }
   }
 }
-
-function sendEnemyTowardsPlayer(){
-  var dx = pointer.x - enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS;
-  var dy = pointer.y - enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS;
-
-  var angle = Math.atan2(dy,dx)
-
-
-}
-
 //Gets point on circle where the line intersects(For placing hitbox)
 function getPointOnLine() {
   var dx = pointer.x - Global.player.sprite.x - MIDDLE_OF_PLAYER_COORDS;
