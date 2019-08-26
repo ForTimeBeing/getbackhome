@@ -18,13 +18,14 @@ export class Player {
     this.friction = 0.2;
     this.maxVelocity = 3;
     this.health = 100;
-    this.damage = 10; 
+    this.damage = 10;
     this.holdDamage = false;
     this.direction = "";
     this.canDodge = true;
     this.dodgeCooldown = 0;
     this.invincibility = false;
     this.invincibilityCount = 0;
+    this.deathVoice = false;
     this.sprite = undefined;
     this.spriteSheet = undefined;
     this.spriteSheet = SpriteSheet({
@@ -237,10 +238,38 @@ export class Player {
       this.invincibility = false;
     }
     Global.enemies.forEach((enemy) => {
-      if (!Global.player.invincibility && Global.player.health > 0 && enemy.sprite.collidesWith(Global.player.sprite)) {
+      if (!Global.player.invincibility && Global.player.health > 0 && enemy.sprite.collidesWith(Global.player.sprite)) {  
         Global.player.health -= 10;
+        if (Global.player.health > 20) {
+          let randomX = Math.floor(Math.random() * 5);
+          if (randomX == 0) {
+            var msg = new SpeechSynthesisUtterance('oof');
+            window.speechSynthesis.speak(msg);
+          }
+          else if (randomX == 1) {
+            var msg = new SpeechSynthesisUtterance('ahh');
+            window.speechSynthesis.speak(msg);
+          }
+          else if (randomX == 2) {
+            var msg = new SpeechSynthesisUtterance('ouchh');
+            window.speechSynthesis.speak(msg);
+          }
+          else if (randomX == 3) {
+            var msg = new SpeechSynthesisUtterance('nooo');
+            window.speechSynthesis.speak(msg);
+          }
+          else if (randomX == 4) {
+            var msg = new SpeechSynthesisUtterance('auuuu');
+            window.speechSynthesis.speak(msg);
+          }
+        }
+        if (this.health <= 10 && this.health > 0){
+          var msg = new SpeechSynthesisUtterance("i'm dying");
+          window.speechSynthesis.speak(msg);
+        }
         Global.player.invincibility = true;
         Global.player.invincibilityCount = 160;
+        
       }
     });
 
@@ -248,7 +277,6 @@ export class Player {
       this.damage++
     }
         //Swings sword
-    //TODO: Add knockback
     //TODO: Add sword sprite
     initPointer();
     onPointerDown((evt, object) => {
@@ -289,6 +317,11 @@ export class Player {
     });
 
     if (this.health <= 0) {
+      if (this.deathVoice == false) {
+        var msg = new SpeechSynthesisUtterance("blah");
+        window.speechSynthesis.speak(msg);
+        this.deathVoice = true;
+      }
       gameOver();
     }
 
