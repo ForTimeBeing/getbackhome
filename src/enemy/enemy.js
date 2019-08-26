@@ -132,7 +132,6 @@ export class Enemy {
       }
     }
 
-
     this.sprite.update();
   }
   render() {

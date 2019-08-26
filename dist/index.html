@@ -4,9 +4,14 @@
     <title>Get Back Home</title>
   </head>
   <body>
-    <canvas id="game" width="896" height="512" style="background-color: #679189;"></canvas>
-    <canvas id="gameOverOverlay" class="hidden" width="896" height="512"></canvas>
-    <button type="button" id="restartButton" class="hidden">Play again</button>
+    <div id="canvasDiv">
+      <canvas id="game" width="896" height="512" style="background-color: #679189;"></canvas>
+      <canvas id="gameOverOverlay" class="hidden"></canvas>
+      <p id="gameOverText" class="hidden">Game Over</p>
+      <button type="button" id="restartButton" class="hidden">Play again</button>
+    </div>
+
     <script src="game.js"></script>
+    
   </body>
 </html>

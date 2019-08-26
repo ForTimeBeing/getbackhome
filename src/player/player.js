@@ -17,8 +17,8 @@ export class Player {
     this.yVelocity = 0;
     this.friction = 0.2;
     this.maxVelocity = 3;
-    this.health = 100;
-    this.damage = 10;
+    this.health = 10; // change back to 100
+    this.damage = 10; 
     this.holdDamage = false;
     this.direction = "";
     this.canDodge = true;
