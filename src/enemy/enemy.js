@@ -28,15 +28,19 @@ export class Enemy {
     let dstX = currentX - playerX;
     let dstY = currentY - playerY;
 
-    if (dstX > this.maxVelocity * 2) {
-      this.sprite.x -= this.maxVelocity;
-    } else if (dstX < this.maxVelocity * 2) {
-      this.sprite.x += this.maxVelocity;
+    let moveX = ()=>{
+      if (dstX > this.maxVelocity * 2) {
+        this.sprite.x -= this.maxVelocity;
+      } else if (dstX < this.maxVelocity * 2) {
+        this.sprite.x += this.maxVelocity;
+      }
     }
-    if (dstY > this.maxVelocity * 2) {
-      this.sprite.y -= this.maxVelocity;
-    } else if (dstY < this.maxVelocity * 2) {
-      this.sprite.y += this.maxVelocity;
+    let moveY = ()=>{
+      if (dstY > this.maxVelocity * 2) {
+        this.sprite.y -= this.maxVelocity;
+      } else if (dstY < this.maxVelocity * 2) {
+        this.sprite.y += this.maxVelocity;
+      }
     }
 
     Global.enemies.forEach((enemy) => {
@@ -56,6 +60,45 @@ export class Enemy {
         }
       }
     });
+
+    if(!Global.tileEngine.engine.layerCollidesWith("walls", this.sprite)){
+      this.sprite.lastX = this.sprite.x;
+      this.sprite.lastY = this.sprite.y;
+      moveX();
+      moveY();
+
+    }else{
+      this.sprite.x = this.sprite.lastX;
+      this.sprite.y = this.sprite.lastY;
+      let canMoveVert = true;
+      let canMoveHori = true;
+
+      moveY();
+      this.sprite.x = this.sprite.lastX;
+      if(Global.tileEngine.engine.layerCollidesWith("walls", this.sprite)){
+        canMoveVert = false;
+      }
+
+      moveX();
+      this.sprite.y = this.sprite.lastY;
+      if(Global.tileEngine.engine.layerCollidesWith("walls", this.sprite)){
+        canMoveHori = false;
+      }
+
+      if(canMoveHori){
+        this.sprite.lastX = this.sprite.x;
+        moveX();
+      }else{
+        this.sprite.x = this.sprite.lastX;
+      }
+
+      if(canMoveVert){
+        this.sprite.lastY = this.sprite.y;
+        moveY();
+      }else{
+        this.sprite.y = this.sprite.lastY;
+      }
+    }
 
 
     this.sprite.update();
