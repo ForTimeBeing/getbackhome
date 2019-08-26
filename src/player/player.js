@@ -255,6 +255,7 @@ export class Player {
       if(evt.button == 0){
         this.holdDamage = true
         onPointerUp((evt,object) => {
+          //Sets max damage
           if (this.damage >= 75){
             this.damage = 75
           }
@@ -268,6 +269,9 @@ export class Player {
               HIT_BOX_SIZE_Y){
                 console.log(this.damage);
                 enemy.health = enemy.health - this.damage;
+                if (enemy.health > 0){
+                  enemy.knockback = true;
+                }
               }
           });  
           this.holdDamage = false
@@ -325,6 +329,7 @@ export class Player {
     }
   }
 }
+
 //Gets point on circle where the line intersects(For placing hitbox)
 function getPointOnLine() {
   var dx = pointer.x - Global.player.sprite.x - MIDDLE_OF_PLAYER_COORDS;

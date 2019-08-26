@@ -15,10 +15,10 @@
     "file-loader": "^4.2.0",
     "kontra": "^6.2.3",
     "path": "^0.12.7",
-    "webpack": "^4.39.2",
     "webpack-bundle-analyzer": "^3.4.1"
   },
   "devDependencies": {
+    "webpack": "^4.39.2",
     "webpack-cli": "^3.3.7"
   }
 }

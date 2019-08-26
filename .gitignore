@@ -1,2 +1,4 @@
 node_modules
 dist/game.js
+package-lock.json
+package.json

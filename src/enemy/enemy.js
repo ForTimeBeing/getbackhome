@@ -1,6 +1,8 @@
-import { Sprite } from 'kontra';
+import { Sprite, pointer} from 'kontra';
 import Global from '../global';
 import utils from '../utils';
+
+const KNOCKBACK_DISTNCE = 35 // Sets knockback distance for AI
 
 export class Enemy {
   constructor(x, y) {
@@ -10,6 +12,8 @@ export class Enemy {
     this.friction = 0.2;
     this.maxVelocity = 1.5;
     this.health = 100;
+    this.knockback = false;
+    this.knockbackTimer = KNOCKBACK_DISTNCE;
     this.sprite = new Sprite({
       x: x,
       y: y,
@@ -28,19 +32,47 @@ export class Enemy {
     let dstX = currentX - playerX;
     let dstY = currentY - playerY;
 
-    let moveX = ()=>{
-      if (dstX > this.maxVelocity * 2) {
-        this.sprite.x -= this.maxVelocity;
-      } else if (dstX < this.maxVelocity * 2) {
-        this.sprite.x += this.maxVelocity;
+      let moveX = () => {
+        if (this.knockback == false) {
+          if (dstX > this.maxVelocity * 2) {
+            this.sprite.x -= this.maxVelocity;
+          } else if (dstX < this.maxVelocity * 2) {
+            this.sprite.x += this.maxVelocity;
+          }
+        }
+        if (this.knockback == true) {
+          this.knockbackTimer--;
+          if (this.knockbackTimer <= 0) {
+            this.knockback = false;
+            this.knockbackTimer = KNOCKBACK_DISTNCE;
+          }
+          if (currentX - pointer.x > this.maxVelocity * 2) {
+            this.sprite.x -= this.maxVelocity;
+          } else if (currentX - pointer.x < this.maxVelocity * 2) {
+            this.sprite.x += this.maxVelocity;
+          }
+        }
       }
-    }
-    let moveY = ()=>{
-      if (dstY > this.maxVelocity * 2) {
-        this.sprite.y -= this.maxVelocity;
-      } else if (dstY < this.maxVelocity * 2) {
-        this.sprite.y += this.maxVelocity;
-      }
+      let moveY = () => {
+        if(this.knockback == false){
+          if (dstY > this.maxVelocity * 2) {
+            this.sprite.y -= this.maxVelocity;
+          } else if (dstY < this.maxVelocity * 2) {
+            this.sprite.y += this.maxVelocity;
+          }
+        }
+        if (this.knockback == true) {
+          this.knockbackTimer--;
+          if(this.knockbackTimer <= 0){
+            this.knockback = false;
+            this.knockbackTimer = KNOCKBACK_DISTNCE;
+          }
+          if (currentY - pointer.y > this.maxVelocity * 2) {
+            this.sprite.y -= this.maxVelocity;
+          } else if (currentY - pointer.y < this.maxVelocity * 2) {
+            this.sprite.y += this.maxVelocity;
+          }
+        }
     }
 
     Global.enemies.forEach((enemy) => {
