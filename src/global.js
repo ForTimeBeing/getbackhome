@@ -8,6 +8,8 @@ var Global = {
   gameLoop: undefined,
   player: undefined,
   enemies: [],
+  score: 0,
+  scoreLabel: document.getElementById("scoreLabel"),
   tileEngine: undefined,
   tileSheet: tileSet2,
   tileSheetImg: new Image(),

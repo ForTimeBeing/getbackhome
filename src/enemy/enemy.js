@@ -88,6 +88,9 @@ export class Enemy {
         for (var i = 0; i < Global.enemies.length; i++) {
           if (enemy._id == Global.enemies[i]._id) {
             Global.enemies.splice(i, 1);
+            // score 
+            Global.score += 10;
+            Global.scoreLabel.innerText = `Score: ${Global.score}`;
           }
         }
       }

@@ -12,6 +12,8 @@ var utils = {
   resetGame: (callback)=>{
     Global.player = undefined;
     Global.enemies = [];
+    Global.score = 0;
+    Global.scoreLabel.innerText = "Score: 0";
     Global.player = new Player(200, 200, Global.playerSheetImg);
     Global.player.render();
     for(let i = 0;i<=Math.floor(Math.random() * 50)+15;i++){
