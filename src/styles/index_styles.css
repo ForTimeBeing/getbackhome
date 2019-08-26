@@ -1,3 +1,6 @@
+/* Imports 8-bit font */
+@import url('https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap');
+
 #canvasDiv {
     position: relative;
     width: 896;
@@ -22,7 +25,8 @@ button {
     position: absolute;
     color: black;
     background-color: green;
-    border-radius: 10px;
+    border-color: black;
+    box-shadow: 5px 5px black;
     top: 50%;
     left: 50%;
     transform: translateX(-50%);
@@ -30,13 +34,16 @@ button {
     width: 200px;
     font-size: 20px;
     font-weight: bold;
+    font-family: 'Press Start 2P', cursive;
     z-index: 2;
 }
 
 p {
     position: absolute;
+    overflow-wrap: unset;
     color: red;
-    font-size: 80px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 60px;
     font-weight: bold;
     -webkit-text-stroke: 3px black;
     top: 10%;
