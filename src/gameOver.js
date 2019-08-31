@@ -1,4 +1,5 @@
 import utils from './utils';
+import Global from './global';
 
 export const gameOver = () => {
     Global.gameLoop.stop();

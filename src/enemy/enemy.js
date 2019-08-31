@@ -1,4 +1,5 @@
 import { Sprite, pointer} from 'kontra';
+import soundEngine from '../lib/soundfx';
 import Global from '../global';
 import utils from '../utils';
 
@@ -87,6 +88,10 @@ export class Enemy {
       if (enemy.health <= 0) {
         for (var i = 0; i < Global.enemies.length; i++) {
           if (enemy._id == Global.enemies[i]._id) {
+            var soundURL = soundEngine([3,,0.1352,0.7332,0.437,0.1295,,-0.2207,,,,,,,,,-0.0107,-0.0469,1,,,,,0.42]); 
+            var player = new Audio();
+            player.src = soundURL;
+            player.play();
             Global.enemies.splice(i, 1);
             // score 
             Global.score += 10;

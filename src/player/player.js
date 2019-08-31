@@ -1,4 +1,5 @@
 import { keyPressed, Sprite, SpriteSheet, initPointer, pointer, onPointerDown, onPointerUp } from 'kontra';
+import soundEngine from '../lib/soundfx';
 import Global from '../global';
 import { gameOver } from '../gameOver';
 
@@ -25,70 +26,67 @@ export class Player {
     this.dodgeCooldown = 0;
     this.invincibility = false;
     this.invincibilityCount = 0;
-    this.deathVoice = false;
-    this.sprite = undefined;
-    this.spriteSheet = undefined;
     this.spriteSheet = SpriteSheet({
       image: spriteSheetImg,
       frameWidth: 32,
       frameHeight: 32,
       animations: {
-        idle: {
+        i: {
           frames: 12
         },
-        up: {
+        u: {
           frames: 0
         },
-        upright: {
+        ur: {
           frames: 3
         },
-        right: {
+        r: {
           frames: 6
         },
-        downright: {
+        dr: {
           frames: 9
         },
-        down: {
+        d: {
           frames: 12
         },
-        downleft: {
+        dl: {
           frames: 15
         },
-        left: {
+        l: {
           frames: 18
         },
-        upleft: {
+        ul: {
           frames: 21
         },
-        upwalking: {
+        uw: {
           frames: [0,1,2],
           frameRate: 15
         },
-        uprightwalking: {
+        urw: {
           frames: [3,4,5],
           frameRate: 15
         },
-        rightwalking: {
+        rw: {
           frames: [6,7,8],
           frameRate: 15
         },
-        downrightwalking: {
+        drw: {
           frames: [9,10,11],
           frameRate: 15
         },
-        downwalking: {
+        dw: {
           frames: [12,13,14],
           frameRate: 15
         },
-        downleftwalking: {
+        dlw: {
           frames: [15,16,17],
           frameRate: 15
         },
-        leftwalking: {
+        lw: {
           frames: [18,19,20],
           frameRate: 15
         },
-        upleftwalking: {
+        ulw: {
           frames: [21,22,23],
           frameRate: 15
         }
@@ -101,21 +99,7 @@ export class Player {
       render: function () {
         this.context.save();
         if (self.invincibility) {
-          if (self.invincibilityCount < 120 && self.invincibilityCount > 115) {
-            this.context.globalAlpha = 1;
-          } else if (self.invincibilityCount < 90 && self.invincibilityCount > 85) {
-            this.context.globalAlpha = 1;
-          } else if (self.invincibilityCount < 60 && self.invincibilityCount > 55) {
-            this.context.globalAlpha = 1;
-          } else if (self.invincibilityCount < 30 && self.invincibilityCount > 25) {
-            this.context.globalAlpha = 1;
-          } else if (self.invincibilityCount < 15 && self.invincibilityCount > 10) {
-            this.context.globalAlpha = 1;
-          } else if (self.invincibilityCount < 5 && self.invincibilityCount > 3) {
-            this.context.globalAlpha = 1;
-          } else {
-            this.context.globalAlpha = 0.5;
-          }
+          this.context.globalAlpha = 0.5;
         }
         this.draw();
         this.context.restore();
@@ -125,26 +109,28 @@ export class Player {
 
   update() {
     //Start of movement ->
-    var dx = pointer.x - Global.player.sprite.x - MIDDLE_OF_PLAYER_COORDS;
-    var dy = pointer.y - Global.player.sprite.y - MIDDLE_OF_PLAYER_COORDS;
+    var self = this;
+    var dx = pointer.x - this.sprite.x - MIDDLE_OF_PLAYER_COORDS;
+    var dy = pointer.y - this.sprite.y - MIDDLE_OF_PLAYER_COORDS;
     var angle = Math.atan2(dy,dx)*(180/Math.PI);
     this.direction = "";
     if(angle > -150 && angle < -30){
-      this.direction = "up";
+      this.direction = "u";
     }
     if(angle < 150 && angle > 30){
-      this.direction = "down";
+      this.direction = "d";
     }
 
     if(angle > -60 && angle < 60){
-      this.direction += "right";
+      this.direction += "r";
     }
     if(angle < -120 || angle > 120){
-      this.direction += "left";
+      this.direction += "l";
     }
     if(!this.direction){
-      this.direction = "idle";
+      this.direction = "i";
     }
+
     if (keyPressed('a')) {
       if (this.xVelocity > this.maxVelocity * -1) {
         this.xVelocity = this.xVelocity - this.friction;
@@ -185,7 +171,7 @@ export class Player {
     }
 
     if(this.xVelocity !== 0 || this.yVelocity !== 0){
-      this.direction += "walking";
+      this.direction += "w";
     }
 
     if(!Global.tileEngine.engine.layerCollidesWith("walls", this.sprite)){
@@ -237,79 +223,73 @@ export class Player {
     if (this.invincibility == true && this.invincibilityCount <= 0) {
       this.invincibility = false;
     }
+
     Global.enemies.forEach((enemy) => {
-      if (!Global.player.invincibility && Global.player.health > 0 && enemy.sprite.collidesWith(Global.player.sprite)) {  
+      if (!Global.player.invincibility && enemy.sprite.collidesWith(Global.player.sprite)) {  
         Global.player.health -= 10;
-        if (Global.player.health > 20) {
-          let randomX = Math.floor(Math.random() * 5);
-          if (randomX == 0) {
-            var msg = new SpeechSynthesisUtterance('oof');
-            window.speechSynthesis.speak(msg);
-          }
-          else if (randomX == 1) {
-            var msg = new SpeechSynthesisUtterance('ahh');
-            window.speechSynthesis.speak(msg);
-          }
-          else if (randomX == 2) {
-            var msg = new SpeechSynthesisUtterance('ouchh');
-            window.speechSynthesis.speak(msg);
-          }
-          else if (randomX == 3) {
-            var msg = new SpeechSynthesisUtterance('nooo');
-            window.speechSynthesis.speak(msg);
-          }
-          else if (randomX == 4) {
-            var msg = new SpeechSynthesisUtterance('auuuu');
-            window.speechSynthesis.speak(msg);
-          }
-        }
-        if (this.health <= 10 && this.health > 0){
-          var msg = new SpeechSynthesisUtterance("i'm dying");
-          window.speechSynthesis.speak(msg);
-        }
+        var soundURL = soundEngine([1,,0.0862,,0.2973,0.6137,,-0.3721,,,,,,,,,,,1,,,0.2017,,0.42]); 
+        var player = new Audio();
+        player.src = soundURL;
+        player.play();
         Global.player.invincibility = true;
         Global.player.invincibilityCount = 160;
-        
       }
     });
-
+    
     if (this.holdDamage == true) {
       this.damage++
     }
-        //Swings sword
+
+    //Swings sword
     //TODO: Add sword sprite
     initPointer();
     onPointerDown((evt, object) => {
       if(evt.button == 0){
         this.holdDamage = true
         onPointerUp((evt,object) => {
+          let sound = [3,0.25,0.09,0.71,0.28,0.09,,0.3,-0.2199,0.71,0.24,,,,,,-0.02,,1,,,,0.02,0.31];
           //Sets max damage
           if (this.damage >= 75){
             this.damage = 75
           }
+          if(this.damage > 30){
+            sound = [3,0.17,0.33,0.99,0.33,0.05,,0.34,-0.2199,0.71,0.24,,,,,,-0.02,,1,,,,0.02,0.31];
+          }
+          let soundURL = soundEngine(sound); 
+          let player = new Audio();
+          player.volume = 0.5;
+          player.src = soundURL;
+          player.play();
           Global.enemies.forEach((enemy) => {
             //Checks to see if an enemy is within the hitbox
             //Note: only checks to see if center of sprite is in the hitbox
-            if ((enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS >= (getPointOnLine().x + Global.player.sprite.x)) && (enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS >= getPointOnLine().y + Global.player.sprite.y) &&
-              (enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().x + Global.player.sprite.x + HIT_BOX_SIZE_X) && (enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS >= getPointOnLine().y + Global.player.sprite.y) &&
-              (enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS >= getPointOnLine().x + Global.player.sprite.x) && (enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().y + Global.player.sprite.y + HIT_BOX_SIZE_Y) &&
-              (enemy.sprite.x + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().x + Global.player.sprite.x + HIT_BOX_SIZE_X) && enemy.sprite.y + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().y + Global.player.sprite.y + 
-              HIT_BOX_SIZE_Y){
-                console.log(this.damage);
+            let enemyY = enemy.sprite.y;
+            let enemyX = enemy.sprite.x;
+            let playerY = self.sprite.y;
+            let playerX = self.sprite.x;
+            if ((enemyX + MIDDLE_OF_ENEMY_COORDS >= (getPointOnLine().x + playerX)) && (enemyY + MIDDLE_OF_ENEMY_COORDS >= getPointOnLine().y + playerY) &&
+              (enemyX + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().x + playerX + HIT_BOX_SIZE_X) && (enemyY + MIDDLE_OF_ENEMY_COORDS >= getPointOnLine().y + playerY) &&
+              (enemyX + MIDDLE_OF_ENEMY_COORDS >= getPointOnLine().x + playerX) && (enemyY + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().y + playerY + HIT_BOX_SIZE_Y) &&
+              (enemyX + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().x + playerX + HIT_BOX_SIZE_X) && enemyY + MIDDLE_OF_ENEMY_COORDS <= getPointOnLine().y + playerY + HIT_BOX_SIZE_Y){
                 enemy.health = enemy.health - this.damage;
                 if (enemy.health > 0){
                   enemy.knockback = true;
                 }
               }
           });  
-          this.holdDamage = false
-          this.damage = 10
+          this.holdDamage = false;
+          this.damage = 10;
         });
       }else if(evt.button == 2 && this.canDodge){
         this.maxVelocity = 12;
         this.friction = 1;
         this.dodgeCooldown = 60;
         this.canDodge = false
+        let soundURL = soundEngine([0,,0.2132,,0.2057,0.3178,,0.169,,,,,,0.0959,,,,,0.7891,,,,,0.42]); 
+        let player = new Audio();
+        player.volume = 0.5;
+        player.src = soundURL;
+        player.play();
         setTimeout(() => {
           this.maxVelocity = 3;
         }, 200);
@@ -317,11 +297,6 @@ export class Player {
     });
 
     if (this.health <= 0) {
-      if (this.deathVoice == false) {
-        var msg = new SpeechSynthesisUtterance("blah");
-        window.speechSynthesis.speak(msg);
-        this.deathVoice = true;
-      }
       gameOver();
     }
 

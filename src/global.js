@@ -33,4 +33,3 @@ var Global = {
 }
 
 export default Global;
-window.Global = Global;
