@@ -3,6 +3,7 @@ import { Enemy } from './enemy/enemy';
 import { TileSet } from './tileEngine/tileEngine';
 import tileSet2 from './assets/compact_sheet.png';
 import playerSheet from './assets/player.png';
+import fontSheet from './assets/font.png';
 
 var Global = {
   gameLoop: undefined,
@@ -15,12 +16,14 @@ var Global = {
   tileSheetImg: new Image(),
   playerSheetImg: new Image(),
   canvas: document.getElementById('game'),
+
   init: (callback) => {
     Global.tileSheetImg.src = Global.tileSheet;
     Global.tileSheetImg.onload = ()=>{
       Global.tileEngine = new TileSet();
       Global.tileEngine.init();
       Global.playerSheetImg.src = playerSheet;
+      Global.fontImg.src = Global.fontSheet;
       Global.playerSheetImg.onload = ()=>{
         Global.player = new Player(200, 200, Global.playerSheetImg);
         for (let i = 0; i <= Math.floor(Math.random() * 50) + 15; i++) {
@@ -29,6 +32,7 @@ var Global = {
         callback();
       }
     }
+
   }
 }
 
