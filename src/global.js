@@ -3,7 +3,7 @@ import { Enemy } from './enemy/enemy';
 import { TileSet } from './tileEngine/tileEngine';
 import tileSet2 from './assets/compact_sheet.png';
 import playerSheet from './assets/player.png';
-import fontSheet from './assets/font.png';
+import fontSheet from './assets/8bitFont.png';
 
 var Global = {
   gameLoop: undefined,
